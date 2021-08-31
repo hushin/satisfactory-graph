@@ -5,15 +5,15 @@
   const recipieGraph = $$('[rowspan] > a > img')
     .map((icon) => {
       const tr = icon.parentNode.parentNode.parentNode
-      const recipieName = tr.innerText.trim()
+      const recipieTitle = tr.innerText.trim()
 
-      if (/代替: バイオ炭|取り出し/.test(recipieName)) return
+      if (/代替: バイオ炭|取り出し/.test(recipieTitle)) return
 
       const nameTr = tr.nextElementSibling
       const names = [...nameTr.querySelectorAll('a')].map(
         (elm) => elm.innerText
       )
-      const [_, ...data] = names
+      const [recipie, ...data] = names
       const materials = data.slice(0, -1)
       const speedsTr =
         tr.nextElementSibling.nextElementSibling.nextElementSibling
@@ -28,11 +28,10 @@
 
       const materialText = zip(materials, matrialSpeeds)
         .map(
-          ([name, speed]) =>
-            `"${name}" -> "${recipieName}" [label="In: ${speed}"]`
+          ([name, speed]) => `"${name}" -> "${recipie}" [label="In: ${speed}"]`
         )
         .join('\n')
-      return `${materialText}\n"${recipieName}" [xlabel="\\n\\n   Out: ${recipieSpeed}"]\n`
+      return `${materialText}\n"${recipie}" [xlabel="\\n\\n   Out: ${recipieSpeed}"]\n`
     })
     .filter(Boolean)
     .join('\n')
