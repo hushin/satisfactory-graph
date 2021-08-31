@@ -1,6 +1,7 @@
 {
   const zip = (arr, ...args) =>
     arr.map((value, idx) => [value, ...args.map((arr) => arr[idx])])
+
   const recipieGraph = $$('[rowspan] > a > img')
     .map((icon) => {
       const tr = icon.parentNode.parentNode.parentNode
@@ -36,7 +37,8 @@
     .filter(Boolean)
     .join('\n')
     .trim()
-  const graph = `
+
+  const dotLang = `
 digraph G {
   graph [pad="0.75", ranksep="0.9", nodesep="1.25"];
   "鉄鉱石" [shape = box]
@@ -59,6 +61,6 @@ ${recipieGraph}
   // recipieGraph end
 }
 `
-  console.log(graph)
-  copy(graph)
+  console.log(dotLang)
+  copy(dotLang)
 }
