@@ -1,4 +1,11 @@
 {
+  // 目標とするレシピをここに書く
+  const TARGETS = [
+    { name: 'ヘビー・モジュラー・フレーム', num: 50 },
+    { name: 'コンピューター', num: 100 },
+    { name: 'コンクリート被覆型鋼梁', num: 200 },
+    { name: 'ゴム', num: 400 },
+  ]
   const getRangeInnerText = (nodeList, start, end) =>
     nodeList
       .slice(start, end)
@@ -118,22 +125,58 @@
   const graph = createRecipieGraph(recipies)
   // console.log(graph)
 
-  // TODO 探索
-  // material が辿れないものは 資源としたい
+  const searchTargets = (targets, graph) => {
+    const newGraph = {}
+    const raws = {}
+
+    // 再帰的に探してグラフに追加する
+    const search = (name) => {
+      // 探索済みはスキップ
+      if (newGraph[name]) return
+
+      // material が辿れないものは 資源としたい
+      if (!graph[name]) {
+        raws[name] = true
+        return
+      }
+
+      newGraph[name] = graph[name]
+      graph[name].materials.forEach((oneMatrials) => {
+        oneMatrials.forEach((material) => {
+          search(material.name)
+        })
+      })
+    }
+
+    targets.forEach((target) => {
+      const { name } = target
+      search(name)
+    })
+
+    newGraph['目標'] = {
+      label: '目標',
+      speed: '',
+      materials: [targets.map(({ name, num }) => ({ name, num }))],
+    }
+    return { graph: newGraph, raws }
+  }
 
   const MATERIAL_STYLES = ['solid', 'dashed', 'dotted']
-
   // graph 情報から Graphviz 描画用のdot言語を生成
-  const createDotLang = (graph) => {
-    const dotLang = Object.entries(graph)
+  const createDotLang = ({ graph, raws }) => {
+    const rawDot = Object.keys(raws)
+      .map((raw) => `"${raw}" [shape = box]`)
+      .join('\n')
+    const graphDot = Object.entries(graph)
       .map(([productName, { label, speed, materials }]) => {
-        // TODO 二重配列対応
         const materialText = materials
           .map((oneMaterials, index) =>
             oneMaterials
-              .map(({ name, speed }) => {
-                const inLabel = speed && `label="In: ${speed}"`
-                return `"${name}" -> "${productName}" [${inLabel} style=${MATERIAL_STYLES[index]}]`
+              .map(({ name, speed, num }) => {
+                const label = num
+                  ? `label=${num}`
+                  : speed && `label="In: ${speed}"`
+                return `"${name}" -> "${productName}" [${label} style=${MATERIAL_STYLES[index]}]`
               })
               .join('\n')
           )
@@ -146,32 +189,19 @@
         return `${materialText}\n"${productName}" [label="${label}" ${outputLabelOrStyle}]\n`
       })
       .join('\n')
-    // .trim()
+
     return `
 digraph G {
-  graph [pad="0.75", ranksep="0.9", nodesep="1.25"];
-  "鉄鉱石" [shape = box]
-  "銅鉱石" [shape = box]
-  "石灰岩" [shape = box]
-  "石炭" [shape = box]
-  "カテリウム鉱石" [shape = box]
-  "未加工石英" [shape = box]
-  "硫黄" [shape = box]
-  "ボーキサイト" [shape = box]
-  "ウラン" [shape = box]
-  "原油" [shape = box]
-  "水" [shape = box]
-  "窒素ガス" [shape = box]
-  "葉" [shape = box]
-  "花弁" [shape = box]
-  "菌糸" [shape = box]
+  graph [pad="0.75", ranksep="1.5", nodesep="0.25"];
   // recipieGraph start
-${dotLang}
+${rawDot}
+${graphDot}
   // recipieGraph end
 }
 `
   }
-  const dotLang = createDotLang(graph)
+  const dotLang = createDotLang(searchTargets(TARGETS, graph))
 
   console.log(dotLang)
+  copy(dotLang)
 }
