@@ -61,7 +61,6 @@
         }
       })
       .filter(Boolean)
-      .flat()
 
   const recipies = parseRecipies()
   // console.log(JSON.stringify(recipies, null, 2))
