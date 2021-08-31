@@ -32,7 +32,7 @@
             `"${name}" -> "${recipieName}" [label="In: ${speed}"]`
         )
         .join('\n')
-      return `${materialText}\n"${recipieName}" [xlabel="Out: ${recipieSpeed}"]\n`
+      return `${materialText}\n"${recipieName}" [xlabel="\\n\\n   Out: ${recipieSpeed}"]\n`
     })
     .filter(Boolean)
     .join('\n')
@@ -40,7 +40,7 @@
 
   const dotLang = `
 digraph G {
-  graph [pad="0.75", ranksep="0.9", nodesep="1.25"];
+  graph [pad="0.75", ranksep="2", nodesep="0.25"];
   "鉄鉱石" [shape = box]
   "銅鉱石" [shape = box]
   "石灰岩" [shape = box]
