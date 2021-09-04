@@ -1,11 +1,13 @@
 {
   // 目標とするレシピをここに書く
   const TARGETS = [
-    { name: 'ヘビー・モジュラー・フレーム', num: 50 },
-    { name: 'コンピューター', num: 100 },
-    { name: 'コンクリート被覆型鋼梁', num: 200 },
-    { name: 'ゴム', num: 400 },
+    // { name: '組立指揮システム', num: 4000 },
+    // { name: '磁界発生装置', num: 4000 },
+    // { name: '熱推進型ロケット', num: 1000 },
+    // { name: '原子核パスタ', num: 1000 },
+    { name: 'アルクラッド・アルミシート', num: 1000 },
   ]
+
   const getRangeInnerText = (nodeList, start, end) =>
     nodeList
       .slice(start, end)
@@ -124,6 +126,8 @@
   const graph = createRecipieGraph(recipies)
   // console.log(graph)
 
+  // あらかじめ資源としておくもの
+  const RAWS = ['水']
   const searchTargets = (targets, graph) => {
     const newGraph = {}
     const raws = {}
@@ -133,8 +137,8 @@
       // 探索済みはスキップ
       if (newGraph[name]) return
 
-      // material が辿れないものは 資源としたい
-      if (!graph[name]) {
+      // 定義済み、またはmaterial が辿れないものは 資源としたい
+      if (RAWS.includes(name) || !graph[name]) {
         raws[name] = true
         return
       }
